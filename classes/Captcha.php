@@ -422,30 +422,62 @@ abstract class Captcha
 	}
 
 	/**
-	 * Returns the img html element or outputs the image to the browser.
+	 * Returns the img html element or generated captcha image content
 	 *
 	 * @param boolean $html Output as HTML
-	 * @return mixed HTML, string or void
+	 * @return mixed HTML or image content
 	 */
 	public function image_render($html)
 	{
-		// Output html element
-		if ($html === TRUE)
-			return '<img src="'.url::site('captcha/'.Captcha::$config['group']).'" width="'.Captcha::$config['width'].'" height="'.Captcha::$config['height'].'" alt="Captcha" class="captcha" />';
+        // Output html element
+        if ($html === TRUE)
+        {
+            $data = '<img src="'.url::site('captcha/'.Captcha::$config['group']).'" width="'.Captcha::$config['width'].'" height="'.Captcha::$config['height'].'" alt="Captcha" class="captcha" />';
+        }
+        else
+        {
+            // Pick the correct output function
+            $function = 'image'.$this->image_type;
 
-		// Send the correct HTTP header
-        Request::current()->headers['Content-Type'] = 'image/'.$this->image_type;
-        Request::current()->headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0';
-        Request::current()->headers['Pragma'] = 'no-cache';
-        Request::current()->headers['Connection'] = 'close';
+            // Start buffering output content
+            ob_start();
+            $function($this->image);
 
-		// Pick the correct output function
-		$function = 'image'.$this->image_type;
-		$function($this->image);
+            // Free up resources
+            imagedestroy($this->image);
 
-		// Free up resources
-		imagedestroy($this->image);
-	}
+            $data = ob_get_contents();
+            ob_end_clean();
+        }
+
+        return $data;
+    }
+
+    /**
+     * Returns headers pairs to use with HTTP response
+     * for image-based captchas
+     * @return array
+     */
+    public function image_http_headers()
+    {
+        return array(
+                'Content-Type' => 'image/' . $this->image_type,
+                'Cache-Control' => 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0',
+                'Pragma' => 'no-cache',
+                'Connection' => 'close',
+            );
+    }
+
+    /**
+     * Basic function to get headers pairs to use with HTTP response
+     * to overwrite in child Captcha classes
+     * @return array
+     */
+    public function http_headers()
+    {
+        // default behavior is to respond without any new headers
+        return array();
+    }
 
 	/* DRIVER METHODS */
 

@@ -30,9 +30,13 @@ class Controller_Captcha extends Controller {
 		// Output the Captcha challenge resource (no html)
 		// Pull the config group name from the URL
 		$group = $this->request->param('group', 'default');
-		Captcha::instance($group)->render(FALSE);
-	}
-	
+
+        $captcha = Captcha::instance($group);
+        $this->response
+            ->headers($captcha->http_headers())
+            ->body($captcha->render(FALSE));
+    }
+
 	public function after()
 	{
 		Captcha::instance()->update_response_session();

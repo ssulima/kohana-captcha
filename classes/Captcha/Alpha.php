@@ -25,6 +25,15 @@ class Captcha_Alpha extends Captcha
 		return $text;
 	}
 
+    /**
+     * Returns HTTP headers for image captcha
+     * @return array
+     */
+    public function http_headers()
+    {
+        return $this->image_http_headers();
+    }
+
 	/**
 	 * Outputs the Captcha image.
 	 *
