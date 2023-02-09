@@ -1,0 +1,17 @@
+{
+  "name": "ssulima/kohana-captcha",
+  "description": "Captcha for Kohana 3.x",
+  "type": "kohana-module",
+  "authors": [
+    {
+      "name": "Wojciech Duda",
+      "email": "wo.duda@gmail.com"
+    },
+    {
+      "name": "Sebastian Sulima",
+      "email": "git@sebastiansulima.pl",
+      "role": "Developer"
+    }
+  ],
+  "require": {}
+}
